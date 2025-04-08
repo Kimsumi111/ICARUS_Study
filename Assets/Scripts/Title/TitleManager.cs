@@ -34,6 +34,13 @@ public class TitleManager : MonoBehaviour
 
     private void Start()
     {
+        UserDataManager.Instance.LoadUserData();
+        if (!UserDataManager.Instance.ExistsSavedData)
+        {
+            UserDataManager.Instance.SetDefaultUserData();
+            UserDataManager.Instance.SaveUserData();
+        }
+        
         StartCoroutine(LoadGameCo());
     }
 
@@ -62,14 +69,20 @@ public class TitleManager : MonoBehaviour
         
         // 로딩이 잘 보이도록
         loadingSlider.value = 0.5f;
-        loadingSliderTxt.text = $"{(int)loadingSlider.value * 100}%";
+        /* loadingSliderTxt.text = $"{(int)loadingSlider.value * 100}%";
+         loadingSlider.value가 먼저 형변환이 되어 버림 => 0.5f -> 0으로.
+         (int)(loadingSlider.value * 100) 이렇게 수정하자.
+         */
+        
+        loadingSliderTxt.text = $"{loadingSlider.value * 100}%";
         yield return new WaitForSeconds(0.5f);
         
         // 로딩 진행 중일 때
         while (!_loadingOperation.isDone)
         {
             loadingSlider.value = _loadingOperation.progress < 0.5f ? 0.5f : _loadingOperation.progress;
-            loadingSliderTxt.text = $"{(int)loadingSlider.value * 100}%";
+            loadingSliderTxt.text = $"{loadingSlider.value * 100}%";
+           
             
             // 로딩 완료되면 전환
             // 90% 에서 항상 멈춤.
